@@ -261,6 +261,7 @@ NeuralNetwork.prototype.initNeurons = function ( inputVertices, navNeuronsPos ) 
 	}
 
 	this.neuronShaderMaterial.needsUpdate = true;
+	this.navNeuronShaderMaterial.needsUpdate = true;
 
 };
 

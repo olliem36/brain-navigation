@@ -28,7 +28,7 @@ var mouse = new THREE.Vector2();
 // cloud.children.push(navNeuronsPointCloud);
 // mesh.children.push(cloud);
 
-window.addEventListener( 'mousemove', function ( event ) {
+document.addEventListener( 'mousemove', function ( event ) {
 	event.preventDefault();
 	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
@@ -38,9 +38,16 @@ window.addEventListener( 'mousemove', function ( event ) {
 	var intersects = raycaster.intersectObjects([neuralNet.navNeuronsCloud]);
 	if (intersects.length != 0) {
 		console.log(intersects);
+
+		intersects[0].object.geometry.colors[0] = new THREE.Color( '#ff2000' );
+		intersects[0].object.geometry.colorsNeedUpdate = true;
+	} else {
+		neuralNet.navNeuronsCloud.geometry.colors[0] = new THREE.Color( '#8600ff' );
+		neuralNet.navNeuronsCloud.geometry.colorsNeedUpdate = true;
 	}
 
-} );
+}, false );
+
 
 $( function () {
 	var timerID;
