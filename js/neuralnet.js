@@ -87,7 +87,7 @@ function NeuralNetwork() {
 	this.navNeuronUniforms = {
 		sizeMultiplier: {
 			type: 'f',
-			value: this.neuronSizeMultiplier
+			value: 1
 		},
 		opacity: {
 			type: 'f',
@@ -100,6 +100,17 @@ function NeuralNetwork() {
 	};
 
 	this.neuronAttributes = {
+		color: {
+			type: 'c',
+			value: []
+		},
+		size: {
+			type: 'f',
+			value: []
+		}
+	};
+
+	this.navNeuronAttributes = {
 		color: {
 			type: 'c',
 			value: []
@@ -125,7 +136,7 @@ function NeuralNetwork() {
 	this.navNeuronShaderMaterial = new THREE.ShaderMaterial( {
 
 		uniforms: this.navNeuronUniforms,
-		attributes: this.neuronAttributes,
+		attributes: this.navNeuronAttributes,
 		vertexShader: null,
 		fragmentShader: null,
 		blending: THREE.AdditiveBlending,
@@ -151,7 +162,7 @@ function NeuralNetwork() {
 	var navNeurons = [];
 	navNeuronsGeom = new THREE.Geometry();
 
-	this.navNeuronsPos.forEach(function(item){
+	/*this.navNeuronsPos.forEach(function(item){
 		var vertex = new THREE.Vector3();
 		
 		vertex.x = item.x;
@@ -159,7 +170,7 @@ function NeuralNetwork() {
 		vertex.z = item.z;
 
 		navNeuronsGeom.vertices.push(vertex);
-	});
+	});*/
 
 	this.navNeuronsCloud = new THREE.PointCloud(navNeuronsGeom, this.navNeuronShaderMaterial);
 
@@ -240,8 +251,9 @@ NeuralNetwork.prototype.initNeurons = function ( inputVertices, navNeuronsPos ) 
 		var pos = this.components.neurons[i];
 
 		if (pos.isNavNeuron) {
-			this.neuronAttributes.color.value[ i ] = new THREE.Color( '#8600ff' ); // initial neuron color
-			this.neuronAttributes.size.value[ i ] = THREE.Math.randFloat( 500, 500 ); // initial neuron size
+			this.navNeuronAttributes.color.value[ 0 ] = new THREE.Color( '#8600ff' ); // initial neuron color
+			//this.navNeuronAttributes.size.value[ 0 ] = THREE.Math.randFloat( 1, 1 ); // initial neuron size
+			this.navNeuronAttributes.size.value[ 0 ] = 50;
 		} else {
 			this.neuronAttributes.color.value[ i ] = new THREE.Color( '#ffffff' ); // initial neuron color
 			this.neuronAttributes.size.value[ i ] = THREE.Math.randFloat( 1, 10.0 ); // initial neuron size
@@ -431,8 +443,10 @@ NeuralNetwork.prototype.updateSettings = function () {
 
 	for ( i = 0; i < this.components.neurons.length; i++ ) {
 		this.neuronAttributes.color.value[ i ].setStyle( this.neuronColor ); // initial neuron color
+		this.navNeuronAttributes.color.value[ 0 ].setStyle( this.neuronColor ); // initial neuron color
 	}
 	this.neuronAttributes.color.needsUpdate = true;
+	this.navNeuronAttributes.color.needsUpdate = true;
 
 	this.neuronUniforms.sizeMultiplier.value = this.neuronSizeMultiplier;
 
