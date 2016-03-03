@@ -32,9 +32,33 @@ Neuron.prototype.createSignal = function ( particlePool, minSpeed, maxSpeed ) {
 	this.receivedSignal = false;
 
 	var signals = [];
+
+	var curVector;
+	var prevVector;
+	var curNeuron;
+	var prevNeuron;
+
 	// create signal to all connected axons
 	for ( var i = 0; i < this.connection.length; i++ ) {
-		if ( this.connection[ i ].axon !== this.prevReleaseAxon ) {
+
+		// curNeuron = this;
+		// console.log(this.prevReleaseAxon);
+		// if (curNeuron.prevReleaseAxon) {
+		// 	if (curNeuron === curNeuron.prevReleaseAxon.neuronA) {
+		// 		prevNeuron = this.prevReleaseAxon.neuronB;
+		// 	} else {
+		// 		prevNeuron = this.prevReleaseAxon.neuronA;
+		// 	}
+
+		// 	console.log(curNeuron);
+		// 	console.log(prevNeuron);
+			
+		// 	curVector =  new THREE.Vector3(n.x, n.y, n.z);
+		// 	prevVector = new THREE.Vector3(n.x, n.y, n.z);
+			
+		// }
+
+		if ( this.connection[ i ].axon !== this.prevReleaseAxon) {
 			var c = new Signal( particlePool, minSpeed, maxSpeed );
 			c.setConnection( this.connection[ i ] );
 			signals.push( c );

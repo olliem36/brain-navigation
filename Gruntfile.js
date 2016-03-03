@@ -1,5 +1,7 @@
 module.exports = function ( grunt ) {
 
+	require('load-grunt-tasks')(grunt); 
+
 	grunt.initConfig( {
 
 		pkg: grunt.file.readJSON( 'package.json' ),
@@ -23,8 +25,23 @@ module.exports = function ( grunt ) {
 			},
 			vendor: {
 				src: [ 'js/vendor/underscore.js', 'js/vendor/jquery.min.js', 'js/vendor/Detector.js', 'js/vendor/dat.gui.min.js',
-						'js/vendor/stats.min.js', 'js/vendor/three.js', 'js/vendor/OrbitControls.js', 'js/vendor/OBJLoader.js'],
+						'js/vendor/stats.min.js', 'js/vendor/three.js', 'js/vendor/OrbitControls.js', 'js/vendor/OBJLoader.js',
+						'node_modules/tween.js/src/Tween.js'
+					 ],
 				dest: 'js/vendor/vendor-merge.js'
+			}
+		},
+		// Ruby and SASS gem needs ot be installed
+		// sudo apt-get install ruby-full 
+		// sudo gem install sass           
+		sass: {
+			dist: {
+			  options: {
+			    style: 'expanded',
+			  },
+			  files: {
+			    'css/app.css': ['css/app.scss'],
+			  }
 			}
 		},
 		uglify: {
@@ -48,6 +65,10 @@ module.exports = function ( grunt ) {
 				files: 'js/*.js',
 				tasks: [ 'concat' ]
 			},
+			css: {
+				files: 'css/*.scss',
+				tasks: [ 'sass' ]
+			},
 			html: {
 				files: '*.html'
 			}
@@ -60,7 +81,6 @@ module.exports = function ( grunt ) {
 				}
 			}
 		}
-
 	} );
 
 	// Load the plugin that provides the tasks.
@@ -69,10 +89,11 @@ module.exports = function ( grunt ) {
 	grunt.loadNpmTasks( 'grunt-contrib-uglify' );
 	grunt.loadNpmTasks( 'grunt-contrib-watch' );
 	grunt.loadNpmTasks( 'grunt-contrib-connect' );
+	grunt.loadNpmTasks('grunt-contrib-sass');
 
 	// tasks
 	grunt.registerTask( 'default', [ 'watch' ] );
-	grunt.registerTask( 'serve', [ 'connect:server', 'watch', 'build'] );
+	grunt.registerTask( 'serve', [ 'connect:server', 'watch', 'sass', 'build'] );
 	grunt.registerTask( 'build', [ 'concat:build', 'uglify:build' ] );
 	grunt.registerTask( 'vendor', [ 'concat:vendor', 'uglify:vendor' ] );
 };

@@ -14,15 +14,21 @@ var screenRatio = WIDTH / HEIGHT;
 var clock = new THREE.Clock();
 var FRAME_COUNT = 0;
 var cameraInitialPos = {
-	x: 0,
-	y: -200,
-	z: -1200
+	x:  680, //0,
+	y:  900, //-200,
+	z: -1030 //-1200
+};
+
+var cameraToPos = {
+	x: -780, //-527,
+	y:  1030, //705,
+	z:  -870, //-1022
 };
 
 // ---- Settings
 var sceneSettings = {
 	pause: false,
-	bgColor: 0x111113,
+	bgColor: 0x151516,
 	enableGridHelper: false,
 	enableAxisHelper: false
 };
@@ -31,8 +37,10 @@ var sceneSettings = {
 container = document.getElementById( 'canvas-container' );
 scene = new THREE.Scene();
 
+
 // ---- Camera
 camera = new THREE.PerspectiveCamera( 10, screenRatio, 10, 5000 );
+cameraCtrl = new THREE.OrbitControls( camera, container );
 // camera orbit control
 // cameraCtrl = new THREE.TrackballControls( camera );
 
@@ -40,12 +48,11 @@ camera = new THREE.PerspectiveCamera( 10, screenRatio, 10, 5000 );
 // cameraCtrl.zoomSpeed = 1.2;
 // cameraCtrl.panSpeed = 0.8;
 
-// cameraCtrl.noZoom = false;
+cameraCtrl.noZoom = false;
 // cameraCtrl.noPan = false;
 
 // cameraCtrl.staticMoving = true;
 // cameraCtrl.dynamicDampingFactor = 0.3;
-cameraCtrl = new THREE.OrbitControls( camera, container );
 
 camera.position.set( cameraInitialPos.x, cameraInitialPos.y, cameraInitialPos.z );
 cameraCtrl.update();
@@ -58,13 +65,17 @@ var requestAnimationFrame = window.requestAnimationFrame ||
 var step = 0;							
 
 requestAnimationFrame(function(){
-	//animateCamera([cameraInitialPos.x, cameraInitialPos.y, cameraInitialPos.z], [-337, 547, -1200], 4000);
-	animateCamera([cameraInitialPos.x, cameraInitialPos.y, cameraInitialPos.z], [-527, 705, -1022], 4000);
+	animateCamera(cameraInitialPos, cameraToPos, 5000);
 });
 
-//camera.rotateOnAxis(new THREE.Vector3(1, 0, 0), degInRad(90));
-scene.rotation.x += 0.1;
 
+var theta = 0;
+var radius = 100;
+theta += 0.1;
+
+// camera.position.x *= Math.sin(THREE.Math.degToRad(theta));
+// camera.position.y *= Math.sin(THREE.Math.degToRad(theta));
+// camera.position.z *= Math.cos(THREE.Math.degToRad(theta));
 
 // ---- Renderer
 renderer = new THREE.WebGLRenderer( {
@@ -93,19 +104,19 @@ var axisHelper = new THREE.AxisHelper( 50 );
 scene.add( axisHelper );
 
 // ia - input array, oa - output array, t - time
-function animateCamera(ia, oa, t) { 
+function animateCamera(positionFrom, positionTo, t) { 
 	var interval = t/60;
 
-	var xi = ia[0];
-	var xo = oa[0];	
+	var xi = positionFrom.x;
+	var xo = positionTo.x;	
 	var xDelta = (xo - xi)/interval;
 
-	var yi = ia[1];
-	var yo = oa[1];
+	var yi = positionFrom.y;
+	var yo = positionTo.y;	
 	var yDelta = (yo - yi)/interval;
 
-	var zi = ia[2];
-	var zo = oa[2];
+	var zi = positionFrom.z;
+	var zo = positionTo.z;	
 	var zDelta = (zo - zi)/interval;
 
 	x = xi + xDelta*step;
@@ -119,7 +130,7 @@ function animateCamera(ia, oa, t) {
 	}
 
 	requestAnimationFrame(function(){
-		animateCamera(ia, oa, t);
+		animateCamera(positionFrom, positionTo, t);
 	});
 }
 
