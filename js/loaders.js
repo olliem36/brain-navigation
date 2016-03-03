@@ -59,8 +59,15 @@ OBJloader.load( 'models/brain_vertex_low.obj', function ( model ) {
 
 var TEXTURES = {};
 var textureLoader = new THREE.TextureLoader( loadingManager );
+
 textureLoader.load( 'sprites/electric.png', function ( tex ) {
-
 	TEXTURES.electric = tex;
+} );
 
+textureLoader.load( 'sprites/hex.png', function ( tex ) {
+	TEXTURES.hex = tex;
+} );
+
+textureLoader.load( 'sprites/circle.png', function ( tex ) {
+	TEXTURES.circle = tex;
 } );

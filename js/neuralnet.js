@@ -1,5 +1,3 @@
-// Neural Network --------------------------------------------------------
-
 function NeuralNetwork() {
 
 	this.initialized = false;
@@ -15,14 +13,14 @@ function NeuralNetwork() {
 		limitSignals           : 10000
 		*/
 
-		verticesSkipStep: 2,
+		verticesSkipStep: 3,
 		maxAxonDist: 10,
 		maxConnectionsPerNeuron: 6,
 		signalMinSpeed: 1.75,
 		signalMaxSpeed: 3.25,
-		currentMaxSignals: 3000,
-		limitSignals: 10000
-
+		currentMaxSignals: 4000,
+		limitSignals: 10000,
+		navNeurons: []
 	};
 
 	this.meshComponents = new THREE.Object3D();
@@ -37,8 +35,8 @@ function NeuralNetwork() {
 	};
 
 	// axon
-	this.axonOpacityMultiplier = 0.5;
-	this.axonColor = '#ffffff';
+	this.axonOpacityMultiplier = 1;
+	this.axonColor = '#0099ff';
 	this.axonGeom = new THREE.BufferGeometry();
 	this.axonPositions = [];
 	this.axonIndices = [];
@@ -63,11 +61,16 @@ function NeuralNetwork() {
 	};
 
 	// neuron
-	this.neuronSizeMultiplier = 1.0;
+	this.neuronSizeMultiplier = 0.7;
 	this.spriteTextureNeuron = TEXTURES.electric;
-	this.neuronColor = '#ffffff';
-	this.neuronOpacity = 0.75;
+	this.spriteTextureNavNeuron = TEXTURES.circle; //TEXTURES.circle
+	this.spriteTextureActiveNavNeuron = TEXTURES.hex; //TEXTURES.hex
+	this.neuronColor = '#00ffff';
+	this.navNeuronColor = '#ffffff';
+	this.neuronOpacity = 1;
+	this.navNeuronOpacity = 0.6;
 	this.neuronsGeom = new THREE.Geometry();
+	this.navNeuronsGeom = new THREE.Geometry();
 
 	this.neuronUniforms = {
 		sizeMultiplier: {
@@ -84,6 +87,36 @@ function NeuralNetwork() {
 		}
 	};
 
+/*	this.navNeuronUniforms = {
+		sizeMultiplier: {
+			type: 'f',
+			value: 1
+		},
+		opacity: {
+			type: 'f',
+			value: this.navNeuronOpacity
+		},
+		texture: {
+			type: 't',
+			value: this.spriteTextureNavNeuron
+		}
+	};
+
+	this.activeNavNeuronUniforms = {
+		sizeMultiplier: {
+			type: 'f',
+			value: 4
+		},
+		opacity: {
+			type: 'f',
+			value: this.navNeuronOpacity
+		},
+		texture: {
+			type: 't',
+			value: this.spriteTextureActiveNavNeuron
+		}
+	};*/
+
 	this.neuronAttributes = {
 		color: {
 			type: 'c',
@@ -95,8 +128,19 @@ function NeuralNetwork() {
 		}
 	};
 
-	this.neuronShaderMaterial = new THREE.ShaderMaterial( {
+/*	this.navNeuronAttributes = {
+		color: {
+			type: 'c',
+			value: []
+		},
+		size: {
+			type: 'f',
+			value: []
+		}
+	};
+*/
 
+	this.neuronShaderMaterial = new THREE.ShaderMaterial( {
 		uniforms: this.neuronUniforms,
 		attributes: this.neuronAttributes,
 		vertexShader: null,
@@ -104,15 +148,73 @@ function NeuralNetwork() {
 		blending: THREE.AdditiveBlending,
 		transparent: true,
 		depthTest: false
+	});
 
-	} );
+/*	this.navNeuronShaderMaterial = new THREE.ShaderMaterial( {
+		uniforms: this.navNeuronUniforms,
+		attributes: this.navNeuronAttributes,
+		vertexShader: null,
+		fragmentShader: null,
+		blending: THREE.AdditiveBlending,
+		transparent: true,
+		depthTest: false
+	});
+
+	this.activeNavNeuronShaderMaterial = new THREE.ShaderMaterial( {
+		uniforms: this.activeNavNeuronUniforms,
+		attributes: this.navNeuronAttributes,
+		vertexShader: null,
+		fragmentShader: null,
+		blending: THREE.AdditiveBlending,
+		transparent: true,
+		depthTest: false
+	});*/
 
 	// info api
 	this.numNeurons = 0;
 	this.numAxons = 0;
 	this.numSignals = 0;
-
 	this.numPassive = 0;
+
+	this.navItems = [
+		{position: {x: -35.41, y: -23.49, z: -17.47}, label: 'Cloud based platform<br>Облачная платформа'},
+		{position: {x: -33.06, y: 23.56, z: 28.03}, label: 'Swarm of robots<br>Управление группировками'},
+		{position: {x: 28.38, y: 16.76, z: 72.06}, label: 'Методология<br>"Эффективное предприятие"'},
+		{position: {x: 29.4, y: -8.57, z: -51.10}, label: 'Smart enterprise<br>ИСУ РВА'}
+	];
+
+	var navPointSvg = '<object type="image/svg+xml" data="img/hex.svg">Your browser does not support SVG</object>';
+
+	this.navStructure = {
+		navItem: {
+			position: {},
+			label: '',
+			navLevel: 1,
+			hasSubnav: true,
+			subnav: {
+				navItem: {
+					position: {},
+					label: '',
+					hasSubnav: false,
+					navLevel: 2
+				},
+				navItem: {
+					position: {},
+					label: '',
+					hasSubnav: false,
+					navLevel: 2
+				},
+				navItem: {
+					position: {},
+					label: '',
+					hasSubnav: false,
+					navLevel: 2
+				},
+			}
+		}
+	}
+
+	this.navNeuronsCloud = new THREE.PointCloud(this.navNeuronsGeom, this.neuronShaderMaterial);
 
 	// initialize NN
 	this.initNeuralNetwork();
@@ -120,8 +222,9 @@ function NeuralNetwork() {
 }
 
 NeuralNetwork.prototype.initNeuralNetwork = function () {
+	var vertices = OBJ_MODELS.brain.geometry.vertices;
+	this.initNeurons( vertices, this.navItems );
 
-	this.initNeurons( OBJ_MODELS.brain.geometry.vertices );
 	this.initAxons();
 
 	this.neuronShaderMaterial.vertexShader = SHADER_CONTAINER.neuronVert;
@@ -134,35 +237,67 @@ NeuralNetwork.prototype.initNeuralNetwork = function () {
 
 };
 
-NeuralNetwork.prototype.initNeurons = function ( inputVertices ) {
+NeuralNetwork.prototype.createNavCloud = function(){
 
+	this.navItems.forEach(function(item){
+	
+		var obj = new THREE.Object3D();
+		
+		obj.position.x = item.position.x;
+		obj.position.y = item.position.y;
+		obj.position.z = item.position.z;
+		navNeurons.push(obj);
+
+	});
+	return navNeurons;
+};
+
+NeuralNetwork.prototype.initNeurons = function ( inputVertices, navItems ) {
 	var i;
-	for ( i = 0; i < inputVertices.length; i += this.settings.verticesSkipStep ) {
+	var navNeurons = [];
+
+	for (i = 0; i < inputVertices.length; i += this.settings.verticesSkipStep ) {
 		var pos = inputVertices[ i ];
 		var n = new Neuron( pos.x, pos.y, pos.z );
+		
 		this.components.neurons.push( n );
 		this.neuronsGeom.vertices.push( n );
 		// dont set neuron's property here because its skip vertices
 	}
 
-	// set neuron attributes value
-	for ( i = 0; i < this.components.neurons.length; i++ ) {
-		this.neuronAttributes.color.value[ i ] = new THREE.Color( '#ffffff' ); // initial neuron color
-		this.neuronAttributes.size.value[ i ] = THREE.Math.randFloat( 0.75, 3.0 ); // initial neuron size
-	}
+	for ( i = 0; i < navItems.length; i += 1) {
 
+		var item = navItems[i];
+		var n = new Neuron( item.position.x, item.position.y, item.position.z );
+
+		n.isNavNeuron = true;
+		this.components.neurons.push( n );
+		this.navNeuronsGeom.vertices.push( n );
+
+	}
 
 	// neuron mesh
 	this.neuronParticles = new THREE.PointCloud( this.neuronsGeom, this.neuronShaderMaterial );
+	this.navNeuronParticles = new THREE.PointCloud( this.navNeuronsGeom, this.navNeuronShaderMaterial );
 	this.meshComponents.add( this.neuronParticles );
+	this.meshComponents.add( this.navNeuronParticles );
+
+	// set neuron attributes value
+	for ( i = 0; i < this.components.neurons.length; i++ ) {
+		var pos = this.components.neurons[i];
+		this.neuronAttributes.color.value[ i ] = new THREE.Color( '#ffffff' ); // initial neuron color
+		this.neuronAttributes.size.value[ i ] = THREE.Math.randFloat( 1, 10.0 ); // initial neuron size
+	}
 
 	this.neuronShaderMaterial.needsUpdate = true;
+	this.initLabels();
 
 };
 
 NeuralNetwork.prototype.initAxons = function () {
 
 	var allNeuronsLength = this.components.neurons.length;
+
 	for ( var j = 0; j < allNeuronsLength; j++ ) {
 		var n1 = this.components.neurons[ j ];
 		for ( var k = j + 1; k < allNeuronsLength; k++ ) {
@@ -204,7 +339,6 @@ NeuralNetwork.prototype.initAxons = function () {
 	this.axonMesh = new THREE.Line( this.axonGeom, this.axonShaderMaterial, THREE.LinePieces );
 	this.meshComponents.add( this.axonMesh );
 
-
 	var numNotConnected = 0;
 	for ( i = 0; i < allNeuronsLength; i++ ) {
 		if ( !this.components.neurons[ i ].connection[ 0 ] ) {
@@ -215,24 +349,74 @@ NeuralNetwork.prototype.initAxons = function () {
 
 };
 
+NeuralNetwork.prototype.initLabels = function() {
+	var navItems = this.navItems;
+	var canvas = document.getElementById('canvas-container');
+	var item;
+	for (i in navItems) {
+		var text = document.createElement( 'div' );
+		item = navItems[i];
+		
+		text.classList.add('nav-label');
+		text.setAttribute('id', i);
+		text.innerHTML = item.label;
+
+    	document.body.insertBefore(text, canvas);
+
+	}
+
+	this.updateLabels();
+};
+
+NeuralNetwork.prototype.updateLabels = function() {
+	var navItems = this.navItems;
+	var canvas = document.getElementById('canvas-container');
+	var item;
+	var labelPadding = {
+		top: -24,
+		left: 24,
+	}
+	for (i in navItems) {
+		var divObj = new THREE.Object3D();
+		var text = document.querySelectorAll('.nav-label')[i];
+		item = navItems[i];
+
+		divObj.x = item.position.x;
+		divObj.y = item.position.y;
+		divObj.z = item.position.z;
+
+		var res = this.toScreenPosition( divObj, camera );
+		
+		text.style.left = res.x + labelPadding.left + 'px';
+		text.style.top = res.y + labelPadding.top + 'px';
+	}
+}
+
 NeuralNetwork.prototype.update = function ( deltaTime ) {
 
 	if ( !this.initialized ) return;
 
-	var n, ii;
+	var n;
+	var ii;
 	var currentTime = Date.now();
+	//var curVector;
+	//var prevVector;
 
 	// update neurons state and release signal
 	for ( ii = 0; ii < this.components.neurons.length; ii++ ) {
 
 		n = this.components.neurons[ ii ];
+		//curVector =  new THREE.Vector3(n.x, n.y, n.z);
+		//prevVector = new THREE.Vector3(n.x, n.y, n.z);
+
+		if (n.isNavNeuron) {
+			//console.log(n.x, n.y);
+		}
 
 		if ( this.components.allSignals.length < this.settings.currentMaxSignals - this.settings.maxConnectionsPerNeuron ) { // limit total signals currentMaxSignals - maxConnectionsPerNeuron because allSignals can not bigger than particlePool size
 
-			if ( n.receivedSignal && n.firedCount < 8 ) { // Traversal mode
+			if ( n.receivedSignal && n.firedCount < 8) { // Traversal mode
 				// if (n.receivedSignal && (currentTime - n.lastSignalRelease > n.releaseDelay) && n.firedCount < 8)  {	// Random mode
-				// if (n.receivedSignal && !n.fired )  {	// Single propagation mode
-				n.fired = true;
 				n.lastSignalRelease = currentTime;
 				n.releaseDelay = THREE.Math.randInt( 100, 1000 );
 				this.releaseSignalAt( n );
@@ -267,6 +451,8 @@ NeuralNetwork.prototype.update = function ( deltaTime ) {
 		}
 
 	}
+
+	this.updateLabels();
 
 	// update particle pool vertices
 	this.particlePool.update();
@@ -334,8 +520,18 @@ NeuralNetwork.prototype.updateSettings = function () {
 
 	for ( i = 0; i < this.components.neurons.length; i++ ) {
 		this.neuronAttributes.color.value[ i ].setStyle( this.neuronColor ); // initial neuron color
+		//this.navNeuronAttributes.color.value[ 0 ].setStyle( this.neuronColor ); // initial neuron color
 	}
+
+	/*for ( i = 0; i < navNeuronsPos.length; i++) {
+
+		var pos = navNeuronsPos[i];
+
+		//this.navNeuronAttributes.color.value[ i ].setStyle( this.neuronColor ); // initial neuron color
+	}*/
+
 	this.neuronAttributes.color.needsUpdate = true;
+	this.navNeuronAttributes.color.needsUpdate = true;
 
 	this.neuronUniforms.sizeMultiplier.value = this.neuronSizeMultiplier;
 
@@ -343,7 +539,6 @@ NeuralNetwork.prototype.updateSettings = function () {
 	this.axonUniforms.opacityMultiplier.value = this.axonOpacityMultiplier;
 
 	this.particlePool.updateSettings();
-
 
 };
 
@@ -354,4 +549,18 @@ NeuralNetwork.prototype.testChangOpcAttr = function () {
 		opcArr[ i ] = THREE.Math.randFloat( 0, 0.5 );
 	}
 	this.axonGeom.attributes.opacity.needsUpdate = true;
+};
+
+NeuralNetwork.prototype.toScreenPosition = function (obj, camera) {
+    var p3D = new THREE.Vector3(obj.x, obj.y, obj.z);
+	var p2D = p3D.project(camera);
+
+	p2D.x = (p2D.x + 1)/2 * window.innerWidth;
+	p2D.y = - (p2D.y - 1)/2 * window.innerHeight;
+
+    return { 
+        x: p2D.x,
+        y: p2D.y
+    };
+
 };
