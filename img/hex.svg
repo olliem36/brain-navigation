@@ -1,4 +1,0 @@
-<svg class='nav-point' xmlns="http://www.w3.org/2000/svg" version="1.1" width="320" height="300" xmlns:xlink="http://www.w3.org/1999/xlink">
-  <polygon class='hex' stroke-width='10' fill='none' stroke='rgba(255,255,255,0)' points="310,150 235,280 85,280 10,150 85,20 235,20"></polygon>
-  <circle class='circle' cx="160" cy="150" r="90" fill="rgba(255,255,255,0.7)" />
-</svg>

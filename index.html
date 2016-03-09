@@ -3,11 +3,15 @@
 <head>
 	<meta charset="utf-8">
 	<title>Neural Network</title>
-	<link rel="stylesheet" href="css/app.css"/>
 	<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="css/app.css"/>
+	<script src='css/icons/grunticon.loader.js'></script>
+	<script type="text/javascript">
+		grunticon(["css/icons/icons.data.svg.css", "css/icons/icons.data.png.css", "css/icons/icons.fallback.css"], grunticon.svgLoadedCallback);
+	</script>
+	<noscript><link href="css/icons/icons.fallback.css" rel="stylesheet"></noscript>
 </head>
 <body>
-
 	<div id="loading">
 		<div class="spinner">
 			<div class="rect1"></div>
@@ -17,7 +21,7 @@
 			<div class="rect5"></div>
 		</div>
 	</div>
-
+	<div class="icon-hex proto" data-grunticon-embed></div>
 	<div id="canvas-container"></div>
 
 	<script src="js/vendor/vendor-merge.js"></script>

@@ -44,6 +44,20 @@ module.exports = function ( grunt ) {
 			  }
 			}
 		},
+    grunticon: {
+	    myIcons: {
+	        files: [{
+	            cwd: 'css/dist/icons/',
+				      dest: 'css/icons/',
+	            src: ['*.svg', '*.png'],
+	            expand: true,
+	        }],
+	        options: {
+	    	  	enhanceSVG: true
+	        },
+        	//grunticon(["icons.data.svg.css", "icons.data.png.css", "icons.fallback.css"], grunticon.svgLoadedCallback );
+	    }
+		},
 		uglify: {
 			options: {},
 			build: {
@@ -83,17 +97,20 @@ module.exports = function ( grunt ) {
 		}
 	} );
 
+
+
 	// Load the plugin that provides the tasks.
 	grunt.loadNpmTasks( 'grunt-browserify' );
 	grunt.loadNpmTasks( 'grunt-contrib-concat' );
 	grunt.loadNpmTasks( 'grunt-contrib-uglify' );
 	grunt.loadNpmTasks( 'grunt-contrib-watch' );
 	grunt.loadNpmTasks( 'grunt-contrib-connect' );
-	grunt.loadNpmTasks('grunt-contrib-sass');
+	grunt.loadNpmTasks( 'grunt-contrib-sass' );
+	grunt.loadNpmTasks( 'grunt-grunticon' );
 
 	// tasks
 	grunt.registerTask( 'default', [ 'watch' ] );
 	grunt.registerTask( 'serve', [ 'connect:server', 'watch', 'sass', 'build'] );
-	grunt.registerTask( 'build', [ 'concat:build', 'uglify:build' ] );
+	grunt.registerTask( 'build', [ 'grunticon', 'concat:build', 'uglify:build' ] );
 	grunt.registerTask( 'vendor', [ 'concat:vendor', 'uglify:vendor' ] );
 };

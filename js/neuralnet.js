@@ -183,7 +183,7 @@ function NeuralNetwork() {
 		{position: {x: 29.4, y: -8.57, z: -51.10}, label: 'Smart enterprise<br>ИСУ РВА'}
 	];
 
-	
+	var navPointSvg = '<object type="image/svg+xml" data="img/hex.svg">Your browser does not support SVG</object>';
 
 	this.navStructure = {
 		navItem: {
@@ -352,25 +352,28 @@ NeuralNetwork.prototype.initAxons = function () {
 NeuralNetwork.prototype.initLabels = function() {
 	var navItems = this.navItems;
 	var canvas = document.getElementById('canvas-container');
-
 	var item;
 	for (i in navItems) {
-		var navPointSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+		var navWrapper = document.createElement('div');
+
+		navWrapper.classList.add('nav-wrapper');
+		navWrapper.setAttribute('id', i);
+
+		var navLabel = document.querySelector('.icon-hex.proto').cloneNode(true);
+		navLabel.classList.remove('proto');
+		navLabel.classList.add('nav-label');
+
+		navWrapper.appendChild(navLabel);
+
 		var text = document.createElement( 'div' );
 		item = navItems[i];
-
-		navPointSvg.classList.add('nav-point');
-		navPointSvg.setAttribute('width', '320');
-		navPointSvg.setAttribute('height', '300');
-		navPointSvg.setAttribute('data-id', i);
-		navPointSvg.innerHTML = '<polygon class="hex" stroke-width="10" fill="none" stroke="rgba(255,255,255,0)" points="310,150 235,280 85,280 10,150 85,20 235,20"></polygon><circle class="circle" cx="160" cy="150" r="90" fill="rgba(255,255,255,0.7)" />'
 		
-		text.classList.add('nav-label');
-		text.setAttribute('data-id', i);
+		text.classList.add('nav-text');
 		text.innerHTML = item.label;
 
-    	document.body.insertBefore(text, canvas);
-    	document.body.insertBefore(navPointSvg, text);
+		navWrapper.appendChild(text);
+
+    document.body.insertBefore(navWrapper, canvas);
 
 	}
 
@@ -385,12 +388,9 @@ NeuralNetwork.prototype.updateLabels = function() {
 		top: -24,
 		left: 24,
 	}
-
 	for (i in navItems) {
 		var divObj = new THREE.Object3D();
-		var svg = document.querySelectorAll('.nav-point')[i];
-		var text = document.querySelectorAll('.nav-label')[i];
-
+		var navEl = document.querySelectorAll('.nav-wrapper')[i];
 		item = navItems[i];
 
 		divObj.x = item.position.x;
@@ -398,13 +398,9 @@ NeuralNetwork.prototype.updateLabels = function() {
 		divObj.z = item.position.z;
 
 		var res = this.toScreenPosition( divObj, camera );
-
-		svg.style.position = 'absolute';
-		svg.style.left = res.x + 'px';
-		svg.style.top = res.y + 'px';		
-		svg.style.transform = 'scale(0.1,0.1)';
-		text.style.left = res.x + labelPadding.left + 'px';
-		text.style.top = res.y + labelPadding.top + 'px';
+		
+		navEl.style.left = res.x + labelPadding.left + 'px';
+		navEl.style.top = res.y + labelPadding.top + 'px';
 	}
 }
 
