@@ -16,7 +16,6 @@ body {
 canvas {
 	display: block;
 	/* fix necessary to remove space at bottom of canvas */
-
 	vertical-align: top;
 }
 #stats {
@@ -31,16 +30,47 @@ canvas {
 	left: 5px;
 	font-style: italic;
 }
+.proto {
+	display: none;
+}
 
-.nav-label {
+.nav-wrapper {
 	position: absolute;
-	cursor: pointer;
-	color: rgba(255,255,255,0.6);
-	font-family: 'Open Sans', sans-serif;
-	@include transition(color 250ms ease, font-size 250ms ease);
+	.nav-label,
+	.nav-text {
+    display: table-cell;
+	}
+	.nav-label {
+    vertical-align: middle;
+  	margin-right: 20px;
+    width: 32px;
+    //transform: scale(0.1, 0.1);
+    transition: all 250ms ease-out;
+    svg {
+    	transform: scale(0.1, 0.1);
+    }
+	}
 	&:hover {
-		color: rgba(255,255,255,1);
-	};
+		.nav-label img{
+			transform: rotate(90deg) scale(1,1);
+			opacity: 1;
+		}
+	}
+
+	.nav-text {
+	  -webkit-user-select: none;  /* Chrome all / Safari all */
+	  -moz-user-select: none;     /* Firefox all */
+	  -ms-user-select: none;      /* IE 10+ */
+	  user-select: none;          /* Likely future */ 
+	  transform: translate(8px, 0);
+		color: rgba(255,255,255,0.6);
+		cursor: pointer;
+		font-family: 'Open Sans', sans-serif;
+		@include transition(color 250ms ease, font-size 250ms ease);
+		&:hover {
+			color: rgba(255,255,255,1);
+		};
+	}
 }
 
 a, a:visited {

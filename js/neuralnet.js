@@ -354,14 +354,26 @@ NeuralNetwork.prototype.initLabels = function() {
 	var canvas = document.getElementById('canvas-container');
 	var item;
 	for (i in navItems) {
+		var navWrapper = document.createElement('div');
+
+		navWrapper.classList.add('nav-wrapper');
+		navWrapper.setAttribute('id', i);
+
+		var navLabel = document.querySelector('.icon-hex.proto').cloneNode(true);
+		navLabel.classList.remove('proto');
+		navLabel.classList.add('nav-label');
+
+		navWrapper.appendChild(navLabel);
+
 		var text = document.createElement( 'div' );
 		item = navItems[i];
 		
-		text.classList.add('nav-label');
-		text.setAttribute('id', i);
+		text.classList.add('nav-text');
 		text.innerHTML = item.label;
 
-    	document.body.insertBefore(text, canvas);
+		navWrapper.appendChild(text);
+
+    document.body.insertBefore(navWrapper, canvas);
 
 	}
 
@@ -378,7 +390,7 @@ NeuralNetwork.prototype.updateLabels = function() {
 	}
 	for (i in navItems) {
 		var divObj = new THREE.Object3D();
-		var text = document.querySelectorAll('.nav-label')[i];
+		var navEl = document.querySelectorAll('.nav-wrapper')[i];
 		item = navItems[i];
 
 		divObj.x = item.position.x;
@@ -387,8 +399,8 @@ NeuralNetwork.prototype.updateLabels = function() {
 
 		var res = this.toScreenPosition( divObj, camera );
 		
-		text.style.left = res.x + labelPadding.left + 'px';
-		text.style.top = res.y + labelPadding.top + 'px';
+		navEl.style.left = res.x + labelPadding.left + 'px';
+		navEl.style.top = res.y + labelPadding.top + 'px';
 	}
 }
 
