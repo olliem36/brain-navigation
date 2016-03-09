@@ -24,6 +24,10 @@ canvas {
   font-style: italic;
 }
 
+.obj-wrapper {
+  position: absolute;
+}
+
 .nav-label {
   position: absolute;
   cursor: pointer;
